@@ -47,6 +47,8 @@ public:
 public:
 	void UpdateState(CA_Mode* mode);
 	void UpdateBoth(int x, int y, Field::State s);
+
+	void SimulateEpochs(CA_Mode* mode, int epochs);
 	
 };
 

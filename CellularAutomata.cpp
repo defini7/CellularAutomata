@@ -32,6 +32,12 @@ void CellularAutomata::UpdateBoth(int x, int y, CellularAutomata::Field::State s
 	output->set(x, y, s);
 }
 
+void CellularAutomata::SimulateEpochs(CA_Mode* mode, int epochs)
+{
+	for (int i = 0; i < epochs; i++)
+		UpdateState(mode);
+}
+
 CellularAutomata::Field::Field(int w, int h)
 {
 	CA_ASSERT(w > 0 && h > 0 && w < INT32_MAX && h < INT32_MAX, "Width and height should be valid");
