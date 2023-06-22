@@ -98,12 +98,12 @@ public:
 
 };
 
-class CA_Mode_LanctonsAnt : public CA_Mode
+class CA_Mode_LangtonsAnt : public CA_Mode
 {
 public:
 	enum class Dir { UP, LEFT, DOWN, RIGHT };
 
-	CA_Mode_LanctonsAnt(int* antPosX, int* antPosY, int* antDir);
+	CA_Mode_LangtonsAnt(int* antPosX, int* antPosY, int* antDir);
 
 	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
 

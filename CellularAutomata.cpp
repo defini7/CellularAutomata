@@ -127,14 +127,14 @@ void CA_Mode_BriansBrain::UpdateState(CellularAutomata::Field* state, CellularAu
 		}
 }
 
-CA_Mode_LanctonsAnt::CA_Mode_LanctonsAnt(int* antPosX, int* antPosY, int* antDir)
+CA_Mode_LangtonsAnt::CA_Mode_LangtonsAnt(int* antPosX, int* antPosY, int* antDir)
 {
 	m_AntPosX = antPosX;
 	m_AntPosY = antPosY;
 	m_AntDir = antDir;
 }
 
-void CA_Mode_LanctonsAnt::UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output)
+void CA_Mode_LangtonsAnt::UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output)
 {
 	state->set(*m_AntPosX, *m_AntPosY, CellularAutomata::Field::State(!(bool)output->get(*m_AntPosX, *m_AntPosY)));
 
@@ -153,7 +153,7 @@ void CA_Mode_LanctonsAnt::UpdateState(CellularAutomata::Field* state, CellularAu
 	}
 }
 
-void CA_Mode_LanctonsAnt::Turn(Dir dir)
+void CA_Mode_LangtonsAnt::Turn(Dir dir)
 {
 	switch (dir)
 	{
