@@ -51,7 +51,7 @@ public:
 		void set(int x, int y, State s);
 	};
 
-	enum class Dir { Up, Left, Down, Right };
+	enum class Dir { UP, LEFT, DOWN, RIGHT };
 
 	Field* output;
 	Field* state;

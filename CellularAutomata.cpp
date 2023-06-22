@@ -119,26 +119,26 @@ bool CellularAutomata::UpdateState(RuleContainer& rule)
 		{
 			switch (dir)
 			{
-			case Dir::Left:	 antDir++; break;
-			case Dir::Right: antDir--; break;
+			case Dir::LEFT:	 antDir++; break;
+			case Dir::RIGHT: antDir--; break;
 			}
 
-			if (antDir < 0)					antDir = (int)Dir::Right;
-			if (antDir > (int)Dir::Right)	antDir = 0;
+			if (antDir < 0)					antDir = (int)Dir::RIGHT;
+			if (antDir > (int)Dir::RIGHT)	antDir = 0;
 		};
 
 		switch (output->get(antPosX, antPosY))
 		{
-		case Field::State::ON:	turn(Dir::Left);  break;
-		case Field::State::OFF: turn(Dir::Right); break;
+		case Field::State::ON:	turn(Dir::LEFT);  break;
+		case Field::State::OFF: turn(Dir::RIGHT); break;
 		}
 
 		switch ((Dir)antDir)
 		{
-		case Dir::Up:	 antPosY--; break;
-		case Dir::Down:  antPosY++; break;
-		case Dir::Left:	 antPosX--; break;
-		case Dir::Right: antPosX++; break;
+		case Dir::UP:	 antPosY--; break;
+		case Dir::DOWN:  antPosY++; break;
+		case Dir::LEFT:	 antPosX--; break;
+		case Dir::RIGHT: antPosX++; break;
 		}
 	}
 	break;
