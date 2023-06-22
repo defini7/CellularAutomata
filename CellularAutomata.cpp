@@ -63,18 +63,18 @@ void CellularAutomata::Field::set(int x, int y, State s)
 
 int CellularAutomata::Field::count_neigh(int x, int y) const
 {
-	int ñount = 0;
+	int count = 0;
 
-	ñount += int(get(x - 1, y - 1) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x + 0, y - 1) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x - 1, y + 0) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x - 1, y + 1) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x + 1, y + 0) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x + 0, y + 1) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x + 1, y + 1) == CellularAutomata::Field::State::ON);
-	ñount += int(get(x + 1, y - 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x - 1, y - 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x + 0, y - 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x - 1, y + 0) == CellularAutomata::Field::State::ON);
+	count += int(get(x - 1, y + 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x + 1, y + 0) == CellularAutomata::Field::State::ON);
+	count += int(get(x + 0, y + 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x + 1, y + 1) == CellularAutomata::Field::State::ON);
+	count += int(get(x + 1, y - 1) == CellularAutomata::Field::State::ON);
 
-	return ñount;
+	return count;
 }
 
 CA_Mode_Rules::CA_Mode_Rules(RuleContainer& rule)
