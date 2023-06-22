@@ -7,31 +7,16 @@
 #include <string>
 
 #ifndef CA_ASSERT
-#define CA_ASSERT assert
+#define CA_ASSERT(expr, msg) assert(expr && msg)
 #endif
 
-using RuleContainer = std::unordered_map<std::string, bool>;
-
-inline RuleContainer RULE_NONE;
-inline RuleContainer RULE_110 = { { "111", 0 }, { "110", 1 }, { "101", 1 }, { "100", 0 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
-inline RuleContainer RULE_30 =  { { "111", 0 }, { "110", 0 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
-inline RuleContainer RULE_184 = { { "111", 1 }, { "110", 0 }, { "101", 1 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 0 }, { "000", 0 } };
-inline RuleContainer RULE_90 =  { { "111", 0 }, { "110", 1 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 1 }, { "000", 0 } };
+class CA_Mode;
 
 class CellularAutomata
 {
 public:
-	enum class Mode
-	{
-		NONE,
-		RULES,
-		CONWAYSGOL,
-		BRIANSBRAIN,
-		LANGTONSANT
-	};
-
 	CellularAutomata() = default;
-	CellularAutomata(uint32_t w, uint32_t h, Mode m);
+	CellularAutomata(uint32_t w, uint32_t h);
 	~CellularAutomata();
 
 public:
@@ -47,11 +32,11 @@ public:
 		int width = 0;
 		int height = 0;
 
-		State get(int x, int y);
+		State get(int x, int y) const;
 		void set(int x, int y, State s);
-	};
 
-	enum class Dir { UP, LEFT, DOWN, RIGHT };
+		int count_neigh(int x, int y) const;
+	};
 
 	Field* output;
 	Field* state;
@@ -59,12 +44,43 @@ public:
 	uint32_t width;
 	uint32_t height;
 
-	Mode mode = Mode::NONE;
+public:
+	void UpdateState(CA_Mode* mode);
+	void UpdateBoth(int x, int y, Field::State s);
+	
+};
 
-	int antPosX = 0;
-	int antPosY = 0;
+class CA_Mode
+{
+public:
+	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) = 0;
+};
 
-	int antDir = 0;
+class CA_Mode_Rules : public CA_Mode
+{
+public:
+	using RuleContainer = std::unordered_map<std::string, bool>;
+
+	CA_Mode_Rules(RuleContainer& rule);
+
+	static inline RuleContainer RNONE;
+	static inline RuleContainer R110 =	{ { "111", 0 }, { "110", 1 }, { "101", 1 }, { "100", 0 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
+	static inline RuleContainer R30 =	{ { "111", 0 }, { "110", 0 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
+	static inline RuleContainer R184 =	{ { "111", 1 }, { "110", 0 }, { "101", 1 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 0 }, { "000", 0 } };
+	static inline RuleContainer R90 =	{ { "111", 0 }, { "110", 1 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 1 }, { "000", 0 } };
+
+public:
+	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
+
+private:
+	RuleContainer* m_Rule = nullptr;
+
+};
+
+class CA_Mode_ConwaysGoL : public CA_Mode
+{
+public:
+	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
 
 private:
 	std::vector<std::vector<int>> m_ConwaysStateLookup =
@@ -73,9 +89,31 @@ private:
 		{ 0, 0, 1, 1, 0, 0, 0, 0, 0 }  // alive
 	};
 
+};
+
+class CA_Mode_BriansBrain : public CA_Mode
+{
 public:
-	bool UpdateState(RuleContainer& rule = RULE_NONE);
-	void UpdateBoth(int x, int y, Field::State s);
+	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
 
 };
 
+class CA_Mode_LanctonsAnt : public CA_Mode
+{
+public:
+	enum class Dir { UP, LEFT, DOWN, RIGHT };
+
+	CA_Mode_LanctonsAnt(int* antPosX, int* antPosY, int* antDir);
+
+	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
+
+private:
+	void Turn(Dir dir);
+	
+private:
+	int* m_AntPosX = nullptr;
+	int* m_AntPosY = nullptr;
+
+	int* m_AntDir = nullptr;
+
+};

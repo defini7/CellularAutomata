@@ -18,6 +18,7 @@ public:
 	~AppDemo()
 	{
 		delete automata;
+		delete mode;
 	}
 
 protected:
@@ -25,13 +26,17 @@ protected:
 	float delay = 0.0f;
 
 	CellularAutomata* automata;
+	CA_Mode* mode;
 
-	CellularAutomata::Mode mode = CellularAutomata::Mode::LANGTONSANT;
+	int antPosX = 0;
+	int antPosY = 0;
+	int antDir = 0;
 
 protected:
 	bool OnUserCreate() override
 	{
-		automata = new CellularAutomata(ScreenWidth(), ScreenHeight(), mode);
+		automata = new CellularAutomata(ScreenWidth(), ScreenHeight());
+		mode = new CA_Mode_LanctonsAnt(&antPosX, &antPosY, &antDir);
 
 		/*auto set = [&](int x, int y, string v)
 		{
@@ -65,13 +70,13 @@ protected:
 	bool OnUserUpdate(float fDeltaTime) override
 	{
 		if (GetKey(def::Key::SPACE).bPressed)
-			automata->UpdateState();
+			automata->UpdateState(mode);
 
 		if (GetKey(def::Key::LEFT_SHIFT).bHeld)
 		{
 			if (ticks >= delay)
 			{
-				automata->UpdateState();
+				automata->UpdateState(mode);
 				ticks = 0.0f;
 			}
 
@@ -88,11 +93,8 @@ protected:
 
 		if (GetMouse(2).bHeld)
 		{
-			switch (mode)
-			{
-			case CellularAutomata::Mode::BRIANSBRAIN: automata->UpdateBoth(MouseX(), MouseY(), CellularAutomata::Field::State::DYING);	break;
-			case CellularAutomata::Mode::LANGTONSANT: automata->antPosX = MouseX(); automata->antPosY = MouseY();						break;
-			}
+			//automata->UpdateBoth(MouseX(), MouseY(), CellularAutomata::Field::State::DYING);
+			antPosX = MouseX(); antPosY = MouseY();
 		}
 
 		if (GetKey(def::Key::LEFT_CONTROL).bPressed)
@@ -107,7 +109,7 @@ protected:
 			{
 				def::Pixel col;
 
-				if (automata->antPosX == x && automata->antPosY == y)
+				if (antPosX == x && antPosY == y)
 				{
 					col = def::RED;
 				}
@@ -141,4 +143,3 @@ int main()
 
 	return 0;
 }
-
