@@ -1,7 +1,7 @@
 # Cellular Automata
 
-## Режимы
-- Правила (из коробки 110 30 184 90)
-- Игра жизни Конвея
-- Мозг Брайана
-- Муравей Лэнгтона
+## Modes
+- Rules (e.g. 110, 30, 184, 90)
+- Conway's Game of Life
+- Brian's brain
+- Langton's ant
