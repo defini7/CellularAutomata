@@ -1,7 +1,7 @@
 #define DGE_APPLICATION
-#include "defGameEngine.h"
+#include "defGameEngine.hpp"
 
-#include "CellularAutomata.h"
+#include "CellularAutomata.hpp"
 
 #include <algorithm>
 
@@ -77,10 +77,10 @@ protected:
 
 	bool OnUserUpdate(float fDeltaTime) override
 	{
-		if (GetKey(def::Key::SPACE).bPressed)
+		if (GetKey(def::Key::SPACE).pressed)
 			automata->UpdateState(mode);
 
-		if (GetKey(def::Key::LEFT_SHIFT).bHeld)
+		if (GetKey(def::Key::LEFT_SHIFT).held)
 		{
 			if (ticks >= delay)
 			{
@@ -92,21 +92,21 @@ protected:
 			ticks += fDeltaTime;
 		}
 
-		if (GetKey(def::Key::LEFT).bHeld) delay -= fDeltaTime;
-		if (GetKey(def::Key::RIGHT).bHeld) delay += fDeltaTime;
+		if (GetKey(def::Key::LEFT).held) delay -= fDeltaTime;
+		if (GetKey(def::Key::RIGHT).held) delay += fDeltaTime;
 
 		delay = clamp(delay, 0.0f, 1.0f);
 
-		if (GetMouse(0).bHeld) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::ON);
-		if (GetMouse(1).bHeld) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::OFF);
+		if (GetMouse(0).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::ON);
+		if (GetMouse(1).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::OFF);
 
-		if (GetMouse(2).bHeld)
+		if (GetMouse(2).held)
 		{
 			//automata->UpdateBoth(MouseX(), MouseY(), CellularAutomata::Field::State::DYING);
 			antPos = GetMouse() / scale;
 		}
 
-		if (GetKey(def::Key::LEFT_CONTROL).bPressed)
+		if (GetKey(def::Key::LEFT_CONTROL).pressed)
 		{
 			for (int i = 0; i < ScreenWidth(); i++)
 				for (int j = 0; j < ScreenHeight(); j++)
@@ -137,7 +137,7 @@ protected:
 				FillRectangle(x * scale, y * scale, scale, scale, col);
 			}
 
-		DrawString(2, 2,  "Delay = " + to_string(delay), def::YELLOW);
+		DrawString(2, 2, "Delay = " + to_string(delay), def::YELLOW);
 		DrawString(2, 12, "Epoch = " + to_string(epoch), def::YELLOW);
 
 		return true;
