@@ -1,9 +1,7 @@
-#include "CellularAutomata.h"
+#include "CellularAutomata.hpp"
 
 CellularAutomata::CellularAutomata(uint32_t w, uint32_t h)
 {
-	CA_ASSERT(w > 0 && h > 0 && w < UINT32_MAX && h < UINT32_MAX, "Width and height should be valid");
-
 	width = w;
 	height = h;
 
@@ -38,47 +36,46 @@ void CellularAutomata::SimulateEpochs(CA_Mode* mode, int epochs)
 		UpdateState(mode);
 }
 
-CellularAutomata::Field::Field(int w, int h)
+CellularAutomata::Field::Field(uint32_t w, uint32_t h)
 {
-	CA_ASSERT(w > 0 && h > 0 && w < INT32_MAX && h < INT32_MAX, "Width and height should be valid");
-
 	width = w;
 	height = h;
 
 	cells = new State[w * h];
-	for (int i = 0; i < w * h; i++) cells[i] = State::OFF;
+	memset(cells, (int)State::OFF, sizeof(State) * w * h);
 }
 
 CellularAutomata::Field::~Field()
 {
-	if (cells != nullptr) delete[] cells;
+	if (cells != nullptr)
+		delete[] cells;
 }
 
-CellularAutomata::Field::State CellularAutomata::Field::get(int x, int y) const
+CellularAutomata::Field::State CellularAutomata::Field::get(uint32_t x, uint32_t y) const
 {
-	if (x >= 0 && y >= 0 && x < width && y < height)
+	if (x < width && y < height)
 		return cells[y * width + x];
 	return State::OFF;
 }
 
-void CellularAutomata::Field::set(int x, int y, State s)
+void CellularAutomata::Field::set(uint32_t x, uint32_t y, State s)
 {
-	if (x >= 0 && y >= 0 && x < width && y < height)
+	if (x < width && y < height)
 		cells[y * width + x] = s;
 }
 
-int CellularAutomata::Field::count_neigh(int x, int y) const
+uint32_t CellularAutomata::Field::count_neighbours(uint32_t x, uint32_t y) const
 {
-	int count = 0;
+	uint32_t count = 0;
 
-	count += int(get(x - 1, y - 1) == CellularAutomata::Field::State::ON);
-	count += int(get(x + 0, y - 1) == CellularAutomata::Field::State::ON);
-	count += int(get(x - 1, y + 0) == CellularAutomata::Field::State::ON);
-	count += int(get(x - 1, y + 1) == CellularAutomata::Field::State::ON);
-	count += int(get(x + 1, y + 0) == CellularAutomata::Field::State::ON);
-	count += int(get(x + 0, y + 1) == CellularAutomata::Field::State::ON);
-	count += int(get(x + 1, y + 1) == CellularAutomata::Field::State::ON);
-	count += int(get(x + 1, y - 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x - 1, y - 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x + 0, y - 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x - 1, y + 0) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x - 1, y + 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x + 1, y + 0) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x + 0, y + 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x + 1, y + 1) == CellularAutomata::Field::State::ON);
+	count += uint32_t(get(x + 1, y - 1) == CellularAutomata::Field::State::ON);
 
 	return count;
 }
@@ -90,33 +87,34 @@ CA_Mode_Rules::CA_Mode_Rules(RuleContainer& rule)
 
 void CA_Mode_Rules::UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output)
 {
-	CA_ASSERT(m_Rule != nullptr, "Rule should not be RNONE");
+	CA_ASSERT(m_Rule, "Rule should not be null");
 
-	for (int y = 0; y < output->height; y++)
-		for (int x = 0; x < output->width; x++)
+	for (uint32_t y = 0; y < output->height; y++)
+		for (uint32_t x = 0; x < output->width; x++)
 		{
-			int c = (int)output->get(x, y);
-			int l = (int)output->get(x - 1, y);
-			int r = (int)output->get(x + 1, y);
-
-			state->set(x, y + 1, (CellularAutomata::Field::State)m_Rule->at({ char(l + 48), char(c + 48), char(r + 48) }));
+			state->set(x, y + 1, (CellularAutomata::Field::State)m_Rule->at({
+				char((char)output->get(x - 1, y) + 48),
+				char((char)output->get(x, y) + 48),
+				char((char)output->get(x + 1, y) + 48)
+			}));
 		}
 }
 
 void CA_Mode_ConwaysGoL::UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output)
 {
-	for (int y = 0; y < output->height; y++)
-		for (int x = 0; x < output->width; x++)
+	for (uint32_t y = 0; y < output->height; y++)
+		for (uint32_t x = 0; x < output->width; x++)
 		{
-			int count = output->count_neigh(x, y);
-			state->set(x, y, CellularAutomata::Field::State(m_ConwaysStateLookup[(int)output->get(x, y)][count]));
+			uint32_t count = output->count_neighbours(x, y);
+			state->set(x, y, CellularAutomata::Field::State(m_ConwaysStateLookup[(uint32_t)output->get(x, y)][count]));
 		}
+
 }
 
 void CA_Mode_BriansBrain::UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output)
 {
-	for (int y = 0; y < output->height; y++)
-		for (int x = 0; x < output->width; x++)
+	for (uint32_t y = 0; y < output->height; y++)
+		for (uint32_t x = 0; x < output->width; x++)
 		{
 			switch (output->get(x, y))
 			{
@@ -124,7 +122,7 @@ void CA_Mode_BriansBrain::UpdateState(CellularAutomata::Field* state, CellularAu
 			case CellularAutomata::Field::State::ON:	state->set(x, y, CellularAutomata::Field::State::DYING); break;
 			case CellularAutomata::Field::State::OFF:
 			{
-				if (output->count_neigh(x, y) == 2)
+				if (output->count_neighbours(x, y) == 2u)
 					state->set(x, y, CellularAutomata::Field::State::ON);
 			}
 			break;
@@ -133,7 +131,7 @@ void CA_Mode_BriansBrain::UpdateState(CellularAutomata::Field* state, CellularAu
 		}
 }
 
-CA_Mode_LangtonsAnt::CA_Mode_LangtonsAnt(int* antPosX, int* antPosY, int* antDir)
+CA_Mode_LangtonsAnt::CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, int32_t* antDir)
 {
 	m_AntPosX = antPosX;
 	m_AntPosY = antPosY;
@@ -167,6 +165,9 @@ void CA_Mode_LangtonsAnt::Turn(Dir dir)
 	case Dir::RIGHT: (*m_AntDir)--; break;
 	}
 
-	if (*m_AntDir < 0)				 *m_AntDir = (int)Dir::RIGHT;
-	if (*m_AntDir > (int)Dir::RIGHT) *m_AntDir = 0;
+	if (*m_AntDir < 0)
+		*m_AntDir = (int)Dir::RIGHT;
+
+	if (*m_AntDir > (int32_t)Dir::RIGHT)
+		*m_AntDir = 0;
 }
