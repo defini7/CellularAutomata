@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CELLULAR_AUTOMATA_HPP
+#define CELLULAR_AUTOMATA_HPP
 
 //#include <cstdint>
 //#include <cstring>
@@ -25,17 +26,17 @@ public:
 		enum class State { ON = 1, OFF = 0, DYING = 3 };
 
 		Field() = default;
-		Field(int w, int h);
+		Field(uint32_t w, uint32_t h);
 		~Field();
 
 		State* cells = nullptr;
-		int width = 0;
-		int height = 0;
+		uint32_t width = 0;
+		uint32_t height = 0;
 
-		State get(int x, int y) const;
-		void set(int x, int y, State s);
+		State get(uint32_t x, uint32_t y) const;
+		void set(uint32_t x, uint32_t y, State s);
 
-		int count_neigh(int x, int y) const;
+		uint32_t count_neighbours(uint32_t x, uint32_t y) const;
 	};
 
 	Field* output;
@@ -49,7 +50,7 @@ public:
 	void UpdateBoth(int x, int y, Field::State s);
 
 	void SimulateEpochs(CA_Mode* mode, int epochs);
-	
+
 };
 
 class CA_Mode
@@ -66,10 +67,10 @@ public:
 	CA_Mode_Rules(RuleContainer& rule);
 
 	static inline RuleContainer RNONE;
-	static inline RuleContainer R110 =	{ { "111", 0 }, { "110", 1 }, { "101", 1 }, { "100", 0 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
-	static inline RuleContainer R30 =	{ { "111", 0 }, { "110", 0 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
-	static inline RuleContainer R184 =	{ { "111", 1 }, { "110", 0 }, { "101", 1 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 0 }, { "000", 0 } };
-	static inline RuleContainer R90 =	{ { "111", 0 }, { "110", 1 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 1 }, { "000", 0 } };
+	static inline RuleContainer R110 = { { "111", 0 }, { "110", 1 }, { "101", 1 }, { "100", 0 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
+	static inline RuleContainer R30 = { { "111", 0 }, { "110", 0 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 1 }, { "001", 1 }, { "000", 0 } };
+	static inline RuleContainer R184 = { { "111", 1 }, { "110", 0 }, { "101", 1 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 0 }, { "000", 0 } };
+	static inline RuleContainer R90 = { { "111", 0 }, { "110", 1 }, { "101", 0 }, { "100", 1 }, { "011", 1 }, { "010", 0 }, { "001", 1 }, { "000", 0 } };
 
 public:
 	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
@@ -105,13 +106,13 @@ class CA_Mode_LangtonsAnt : public CA_Mode
 public:
 	enum class Dir { UP, LEFT, DOWN, RIGHT };
 
-	CA_Mode_LangtonsAnt(int* antPosX, int* antPosY, int* antDir);
+	CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, int32_t* antDir);
 
 	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
 
 private:
 	void Turn(Dir dir);
-	
+
 private:
 	int* m_AntPosX = nullptr;
 	int* m_AntPosY = nullptr;
@@ -119,3 +120,5 @@ private:
 	int* m_AntDir = nullptr;
 
 };
+
+#endif
