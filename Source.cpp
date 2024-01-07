@@ -29,23 +29,24 @@ protected:
 	CA_Mode* mode;
 
 	def::vi2d antPos;
-	int antDir = 0;
+	CA_Mode_LangtonsAnt::Dir antDir = CA_Mode_LangtonsAnt::Dir::UP;
 
 	int epoch = 1;
 
-	int scale = 2;
+	int scale = 1;
 
 protected:
 	bool OnUserCreate() override
 	{
 		automata = new CellularAutomata(ScreenWidth() / scale, ScreenHeight() / scale);
 		mode = new CA_Mode_LangtonsAnt(&antPos.x, &antPos.y, &antDir);
+		//mode = new CA_Mode_ConwaysGoL();
 
-		/*auto set = [&](int x, int y, string v)
+		auto set = [&](int x, int y, string v)
 		{
 			for (int i = 0; i < v.size(); i++)
 				automata->state->set(x + i, y, CellularAutomata::Field::State(v[i] == '#'));
-		};*/
+		};
 
 		// Gosper's glider gun
 		/*set(10, 15, "........................#............");
@@ -65,7 +66,7 @@ protected:
 		set(60, 48, "..#.#.#");
 		set(60, 49, "###.###");*/
 
-		//automata->UpdateState(mode);
+		automata->UpdateState(mode);
 
 		antPos = ScreenSize() / scale / 2;
 
@@ -97,12 +98,12 @@ protected:
 
 		delay = clamp(delay, 0.0f, 1.0f);
 
-		if (GetMouse(0).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::ON);
-		if (GetMouse(1).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::OFF);
+		if (GetMouse(def::Button::LEFT).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::ON);
+		if (GetMouse(def::Button::RIGHT).held) automata->UpdateBoth(MouseX() / scale, MouseY() / scale, CellularAutomata::Field::State::OFF);
 
-		if (GetMouse(2).held)
+		if (GetMouse(def::Button::WHEEL).held)
 		{
-			//automata->UpdateBoth(MouseX(), MouseY(), CellularAutomata::Field::State::DYING);
+			automata->UpdateBoth(MouseX(), MouseY(), CellularAutomata::Field::State::DYING);
 			antPos = GetMouse() / scale;
 		}
 
@@ -115,8 +116,8 @@ protected:
 			epoch = 1;
 		}
 
-		for (int x = 0; x < ScreenWidth(); x++)
-			for (int y = 0; y < ScreenHeight(); y++)
+		for (int y = 0; y < ScreenHeight(); y++)
+			for (int x = 0; x < ScreenWidth(); x++)
 			{
 				def::Pixel col;
 
