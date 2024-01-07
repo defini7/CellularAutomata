@@ -55,6 +55,7 @@ CellularAutomata::Field::State CellularAutomata::Field::get(uint32_t x, uint32_t
 {
 	if (x < width && y < height)
 		return cells[y * width + x];
+
 	return State::OFF;
 }
 
@@ -68,14 +69,20 @@ uint32_t CellularAutomata::Field::count_neighbours(uint32_t x, uint32_t y) const
 {
 	uint32_t count = 0;
 
-	count += uint32_t(get(x - 1, y - 1) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x + 0, y - 1) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x - 1, y + 0) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x - 1, y + 1) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x + 1, y + 0) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x + 0, y + 1) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x + 1, y + 1) == CellularAutomata::Field::State::ON);
-	count += uint32_t(get(x + 1, y - 1) == CellularAutomata::Field::State::ON);
+	auto check_cell = [&](uint32_t x, uint32_t y)
+		{
+			if (get(x, y) == CellularAutomata::Field::State::ON)
+				count++;
+		};
+
+	check_cell(x - 1, y - 1);
+	check_cell(x + 0, y - 1);
+	check_cell(x - 1, y + 0);
+	check_cell(x - 1, y + 1);
+	check_cell(x + 1, y + 0);
+	check_cell(x + 0, y + 1);
+	check_cell(x + 1, y + 1);
+	check_cell(x + 1, y - 1);
 
 	return count;
 }
@@ -131,7 +138,7 @@ void CA_Mode_BriansBrain::UpdateState(CellularAutomata::Field* state, CellularAu
 		}
 }
 
-CA_Mode_LangtonsAnt::CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, int32_t* antDir)
+CA_Mode_LangtonsAnt::CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, Dir* antDir)
 {
 	m_AntPosX = antPosX;
 	m_AntPosY = antPosY;
@@ -148,7 +155,7 @@ void CA_Mode_LangtonsAnt::UpdateState(CellularAutomata::Field* state, CellularAu
 	case CellularAutomata::Field::State::OFF:	Turn(Dir::RIGHT); break;
 	}
 
-	switch (Dir(*m_AntDir))
+	switch (*m_AntDir)
 	{
 	case Dir::UP:	 (*m_AntPosY)--; break;
 	case Dir::DOWN:  (*m_AntPosY)++; break;
@@ -161,13 +168,13 @@ void CA_Mode_LangtonsAnt::Turn(Dir dir)
 {
 	switch (dir)
 	{
-	case Dir::LEFT:	 (*m_AntDir)++; break;
-	case Dir::RIGHT: (*m_AntDir)--; break;
+	case Dir::LEFT:	 *m_AntDir = Dir(int(*m_AntDir) + 1); break;
+	case Dir::RIGHT: *m_AntDir = Dir(int(*m_AntDir) - 1); break;
 	}
 
-	if (*m_AntDir < 0)
-		*m_AntDir = (int)Dir::RIGHT;
+	if (*m_AntDir < Dir::UP)
+		*m_AntDir = Dir::RIGHT;
 
-	if (*m_AntDir > (int32_t)Dir::RIGHT)
-		*m_AntDir = 0;
+	if (*m_AntDir > Dir::RIGHT)
+		*m_AntDir = Dir::UP;
 }

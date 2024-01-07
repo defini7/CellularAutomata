@@ -3,11 +3,11 @@
 
 //#include <cstdint>
 //#include <cstring>
-#include <cassert>
 #include <unordered_map>
 #include <string>
 
 #ifndef CA_ASSERT
+#include <cassert>
 #define CA_ASSERT(expr, msg) assert(expr && msg)
 #endif
 
@@ -106,7 +106,7 @@ class CA_Mode_LangtonsAnt : public CA_Mode
 public:
 	enum class Dir { UP, LEFT, DOWN, RIGHT };
 
-	CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, int32_t* antDir);
+	CA_Mode_LangtonsAnt(int32_t* antPosX, int32_t* antPosY, Dir* antDir);
 
 	virtual void UpdateState(CellularAutomata::Field* state, CellularAutomata::Field* output) override;
 
@@ -117,7 +117,7 @@ private:
 	int* m_AntPosX = nullptr;
 	int* m_AntPosY = nullptr;
 
-	int* m_AntDir = nullptr;
+	Dir* m_AntDir = nullptr;
 
 };
 
